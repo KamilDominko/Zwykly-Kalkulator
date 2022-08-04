@@ -33,7 +33,11 @@ class Operacja:
             x = zmn1 * zmn2
         elif self.oper == "/":
             x = zmn1 // zmn2
-        return int(x)
+
+        if x % 1 == 0:
+            return x
+        else:
+            return round(x, 2)
 
     def drop(self):
         return self.oper
@@ -44,14 +48,20 @@ class Zmienna:
         self.zmn = None
 
     def set(self, zmienna):
-        self.zmn = int(zmienna)
+        if zmienna % 1 == 0:
+            self.zmn = int(zmienna)
+        else:
+            self.zmn = float(round(zmienna, 2))
 
     def clear(self):
         self.zmn = None
 
     def add(self, var):
-        x = str(self.zmn) + str(var)
-        self.set(x)
+        if var == ",":
+            self.zmn = str(self.zmn) + "."
+        else:
+            x = float(str(self.zmn) + str(var))
+            self.set(x)
 
     def change_sign(self):
         self.zmn *= -1
@@ -141,6 +151,31 @@ class Kalkulator:
                     self.display_text.set(self.zmn1.drop())
                 elif self.zmn2.drop() is not None:
                     self.zmn2.change_sign()
+                    self.display_text.set(self.zmn2.drop())
+        elif symbol == "%":  # Procentowanie
+            if self.zmn1.drop() is not None:
+                if self.oper.drop() is None:
+                    if self.zmn2.drop() is None:
+                        self.zmn1.set(self.zmn1.drop() / 100)
+                        self.display_text.set(self.zmn1.drop())
+                elif self.oper.drop() is not None:
+                    if self.zmn2.drop() is None:
+                        self.zmn2.set(self.zmn1.drop() * (self.zmn1.drop() / 100))
+                        self.display_text.set(self.zmn2.drop())
+                    elif self.zmn2.drop() is not None:
+                        self.zmn2.set(self.zmn1.drop() * (self.zmn2.drop() / 100))
+                        self.display_text.set(self.zmn2.drop())
+        elif symbol == ",":  # Zmiana na float
+            if self.zmn1.drop() is not None:
+                if self.zmn2.drop() is None and self.oper.drop() is None:
+                    self.zmn1.add(symbol)
+                    self.display_text.set(self.zmn1.drop())
+                elif self.zmn2.drop() is None and self.oper.drop() is not None:
+                    self.zmn2.set(0.)
+                    self.zmn2.add(symbol)
+                    self.display_text.set(self.zmn2.drop())
+                elif self.zmn2.drop() is not None:
+                    self.zmn2.add(symbol)
                     self.display_text.set(self.zmn2.drop())
 
     def stworz_pasek_statusu(self):
